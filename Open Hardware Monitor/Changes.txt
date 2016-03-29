@@ -1,0 +1,24 @@
+These are the changes i made to the fork at https://github.com/cody82/open-hardware-monitor
+To change its serial output format for my arduino project.
+You can edit it here as well to change what data is sent to ardiuno via Serial, and default serial port.
+
+Edit \GUI\MainForm.cs inside function timer_Tick()
+
+	string tmp = "";
+		
+	var cpu = computer.Hardware.Where(x => x.HardwareType == HardwareType.CPU).ToArray().First();
+	var cpu_load = cpu.Sensors.Where(x => x.SensorType == SensorType.Load).ToArray().Average(x => x.Value.Value);
+
+	var memory = computer.Hardware.Where(x => x.HardwareType == HardwareType.RAM).ToArray().First();
+	var memory_load = memory.Sensors.Where(x => x.SensorType == SensorType.Load).ToArray().Average(x => x.Value.Value);
+
+	tmp += string.Format("C{0}\r", (int)cpu_load);
+	tmp += string.Format("M{0}\r", (int)memory_load);
+	tmp += string.Format("T{0}\r", (int)MaxTemp(computer, HardwareType.CPU));
+	serial.Write(Encoding.ASCII.GetBytes(tmp));
+
+
+Edit \Utilities\Serial.cs inside class Serial
+
+		public string Port = "COM9";
+        SerialPort serial = new SerialPort("COM9", 9600);
